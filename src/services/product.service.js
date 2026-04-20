@@ -82,9 +82,16 @@ export const getProductBySlug = async (slug, userId = null) => {
   const { data: product, error } = await query;
 
   if (error) {
-    if (error.code === "PGRST116") return null; // Not found
+    if (error.code === "PGRST116") return null;
     throw error;
   }
+
+  // Fetch creator profile
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("full_name, avatar_url")
+    .eq("user_id", product.user_id)
+    .maybeSingle();
 
   let has_upvoted = false;
   if (userId) {
@@ -102,6 +109,7 @@ export const getProductBySlug = async (slug, userId = null) => {
     ...product,
     upvotes_count: product.upvotes[0]?.count || 0,
     has_upvoted,
+    creator: profile,
   };
 };
 
