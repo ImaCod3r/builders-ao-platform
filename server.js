@@ -13,8 +13,9 @@ const viewsPath = path.join(__dirname, "src", "views");
 
 const app = express();
 
+app.use(express.static(path.join(__dirname, "public")));
 app.use(cookieParser());
-app.use(getUserSession); // Adicionado para povoar o user para todas as páginas Nunjucks
+app.use(getUserSession); 
 
 app.set("views", viewsPath);
 app.set("view engine", "njk");

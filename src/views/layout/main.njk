@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Builders AO Platform{% endblock %}</title>
     
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico">
+    <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
+    
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,11 +62,9 @@
     <!-- Navegação Estilo Vercel/Shadcn -->
     <header class="sticky top-0 z-40 w-full border-b border-gray-100 bg-white/80 backdrop-blur-md">
         <div class="container mx-auto px-4 h-16 flex items-center justify-between">
-            <a href="/" class="flex items-center gap-2.5 transition-opacity hover:opacity-90">
-                <div class="bg-brand-red p-1.5 rounded-lg shadow-sm">
-                    <i data-lucide="layers" class="w-5 h-5 text-white"></i>
-                </div>
-                <span class="text-lg font-bold tracking-tight text-gray-900">Builders <span class="text-brand-red">AO</span></span>
+            <a href="/" class="flex items-center gap-3 transition-transform hover:scale-105">
+                <img src="/assets/logo.png" alt="Logo" class="h-8 w-auto">
+                <span class="text-lg font-black tracking-tighter text-gray-900 uppercase">Builders AO</span>
             </a>
             
             <nav class="hidden md:flex items-center gap-6">
@@ -115,7 +117,7 @@
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row justify-between items-center gap-6">
                 <div class="flex items-center gap-2">
-                    <i data-lucide="layers" class="w-5 h-5 text-gray-400"></i>
+                    <img src="/assets/logo.png" alt="Logo" class="h-6 w-auto grayscale opacity-50">
                     <span class="font-bold text-gray-400">Builders AO</span>
                 </div>
                 <p class="text-sm text-gray-500">&copy; 2026 Builders AO. Todos os direitos reservados.</p>
@@ -126,6 +128,19 @@
             </div>
         </div>
     </footer>
+
+    <!-- Floating WhatsApp Community Button -->
+    <a href="https://chat.whatsapp.com/GZilhWvZgeb0nScmIxFZQX" 
+       target="_blank" 
+       rel="noopener noreferrer"
+       class="fixed bottom-6 right-6 z-50 flex items-center justify-center p-0.5 rounded-full bg-white shadow-2xl border border-gray-100 transition-transform hover:scale-110 active:scale-95 group"
+       title="Entrar na nossa comunidade no WhatsApp">
+        <div class="bg-[#25D366] text-white p-3 rounded-full shadow-lg relative overflow-hidden">
+            <i data-lucide="message-circle" class="w-6 h-6"></i>
+            <span class="absolute inset-0 rounded-full bg-white animate-ping opacity-20 scale-125"></span>
+        </div>
+        <span class="max-w-0 overflow-hidden whitespace-nowrap group-hover:max-w-[200px] group-hover:px-4 transition-all duration-300 font-bold text-sm text-gray-700">Comunidade WhatsApp</span>
+    </a>
 
     <!-- Global Modal Structure -->
     <div id="global-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity">
