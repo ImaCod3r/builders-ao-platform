@@ -2,6 +2,7 @@ import { Router } from "express";
 import auth from "./auth.routes.js";
 import admin from "./admin.routes.js";
 import { checkAuth } from "../middlewares/checkAuth.js";
+import productRouter from "./product.routes.js";
 
 const indexRouter = Router();
 
@@ -16,5 +17,6 @@ indexRouter.get("/login", (req, res) => {
 
 indexRouter.use("/auth", auth);
 indexRouter.use("/admin", checkAuth, admin);
+indexRouter.use("/", productRouter);
 
 export default indexRouter;
