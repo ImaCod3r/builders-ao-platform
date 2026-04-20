@@ -2,6 +2,16 @@
 
 {% block title %}{{ product.name }} - Builders AO{% endblock %}
 
+{% block description %}{{ product.description }} - Saiba mais sobre o projeto {{ product.name }} na Builders AO.{% endblock %}
+
+{% block ogTitle %}{{ product.name }} - Builders AO{% endblock %}
+{% block ogDescription %}{{ product.description }}{% endblock %}
+{% block ogImage %}{{ product.logo_url or 'https://buildersangola.tech/assets/logo.png' }}{% endblock %}
+
+{% block twitterTitle %}{{ product.name }} - Builders AO{% endblock %}
+{% block twitterDescription %}{{ product.taglines }}{% endblock %}
+{% block twitterImage %}{{ product.logo_url or 'https://buildersangola.tech/assets/logo.png' }}{% endblock %}
+
 {% block content %}
 <div class="max-w-4xl mx-auto py-12 px-4 sm:px-6">
     
