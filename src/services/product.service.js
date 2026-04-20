@@ -263,3 +263,17 @@ export const toggleUpvote = async (userId, productId) => {
 
   return { action, count };
 };
+
+export const deleteProduct = async (id, userId) => {
+  const { data, error } = await supabase
+    .from("products")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", userId);
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+};

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import multer from "multer";
 import { checkAuth } from "../middlewares/checkAuth.js";
-import { renderProfilePage, updateProfile } from "../controllers/user.controller.js";
+import { renderProfilePage, renderProfileEditPage, updateProfile } from "../controllers/user.controller.js";
 
 const userLayoutRouter = Router();
 const upload = multer({ 
@@ -10,6 +10,7 @@ const upload = multer({
 });
 
 userLayoutRouter.get("/profile", checkAuth, renderProfilePage);
-userLayoutRouter.post("/profile", checkAuth, upload.single("avatar"), updateProfile);
+userLayoutRouter.get("/profile/edit", checkAuth, renderProfileEditPage);
+userLayoutRouter.post("/profile/edit", checkAuth, upload.single("avatar"), updateProfile);
 
 export default userLayoutRouter;

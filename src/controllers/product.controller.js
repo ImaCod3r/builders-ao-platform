@@ -145,3 +145,14 @@ export const submitProduct = async (req, res) => {
     });
   }
 };
+
+export const handleProductDeletion = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await productService.deleteProduct(id, req.user.id);
+    res.redirect("/profile?success=" + encodeURIComponent("Produto eliminado com sucesso!"));
+  } catch (error) {
+    console.error("Erro ao eliminar produto:", error);
+    res.redirect("/profile?error=" + encodeURIComponent("Erro ao eliminar o produto."));
+  }
+};

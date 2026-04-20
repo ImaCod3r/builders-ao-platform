@@ -9,6 +9,7 @@ import {
   renderEditPage,
   editProduct,
   renderProductPage,
+  handleProductDeletion,
 } from "../controllers/product.controller.js";
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -26,5 +27,6 @@ productRouter.post(
   editProduct,
 );
 productRouter.post("/products/:id/upvote", checkAuth, handleUpvote);
+productRouter.post("/products/:id/delete", checkAuth, handleProductDeletion);
 
 export default productRouter;
