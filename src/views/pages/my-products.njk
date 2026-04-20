@@ -1,0 +1,111 @@
+{% extends "layout/main.njk" %}
+
+{% block title %}Meus Produtos - Builders AO{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Meus Produtos</h1>
+        <a href="/submit" class="bg-brand-red text-white px-5 py-2.5 rounded-lg font-bold shadow-md hover:bg-brand-darkred hover:shadow-lg transition flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            Novo Produto
+        </a>
+    </div>
+
+    {% if error %}
+        <div class="bg-red-50 border-l-4 border-brand-red p-4 mb-6 rounded shadow-sm">
+            <p class="text-brand-red font-medium">{{ error }}</p>
+        </div>
+    {% endif %}
+
+    {% if products and products.length > 0 %}
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-100">
+                            <th class="py-4 px-6 font-bold text-gray-600 text-sm uppercase tracking-wider">Produto</th>
+                            <th class="py-4 px-6 font-bold text-gray-600 text-sm uppercase tracking-wider">Status</th>
+                            <th class="py-4 px-6 font-bold text-gray-600 text-sm uppercase tracking-wider text-center">Upvotes</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        {% for project in products %}
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="py-4 px-6 md:w-1/2">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 flex-shrink-0 bg-brand-light rounded-lg flex items-center justify-center border border-gray-100 overflow-hidden hidden sm:flex">
+                                            {% if project.logo_url %}
+                                                <img src="{{ project.logo_url }}" alt="Logo {{ project.name }}" class="max-h-full max-w-full object-contain">
+                                            {% else %}
+                                                <span class="text-brand-red opacity-50 font-bold text-[10px] uppercase text-center leading-tight">Mídia</span>
+                                            {% endif %}
+                                        </div>
+                                        <div>
+                                            <h3 class="font-bold text-gray-900 {% if project.url %}hover:text-brand-red transition-colors{% endif %}">
+                                                {% if project.url %}
+                                                    <a href="{{ project.url }}" target="_blank" rel="noopener noreferrer">{{ project.name }}</a>
+                                                {% else %}
+                                                    {{ project.name }}
+                                                {% endif %}
+                                            </h3>
+                                            <p class="text-sm text-gray-500 line-clamp-1 mt-0.5">
+                                                {{ project.taglines | default('Sem descrição') }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-4 px-6">
+                                    {% if project.status == 'published' %}
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                            Publicado
+                                        </span>
+                                    {% elif project.status == 'pending' %}
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-700">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span>
+                                            Pendente
+                                        </span>
+                                    {% elif project.status == 'rejected' %}
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                            Rejeitado
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-700">
+                                            {{ project.status | capitalize }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="py-4 px-6 text-center">
+                                    <span class="inline-flex items-center justify-center min-w-[3rem] px-2 py-1 rounded-lg bg-red-50 text-brand-red font-bold">
+                                        {{ project.upvotes_count }}
+                                    </span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="bg-white border-2 border-dashed border-gray-200 rounded-xl p-12 text-center">
+            <div class="mb-4">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Nenhum produto postado</h3>
+            <p class="text-gray-500 mb-6">Você ainda não enviou nenhum projeto para a comunidade.</p>
+            <a href="/submit" class="inline-flex items-center gap-2 bg-brand-red text-white px-5 py-2.5 rounded-lg font-bold shadow hover:bg-brand-darkred transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Enviar meu primeiro projeto
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

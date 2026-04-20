@@ -4,6 +4,20 @@ export const renderSubmitPage = (req, res) => {
   res.render("pages/submit.njk", { user: req.user });
 };
 
+export const renderMyProductsPage = async (req, res) => {
+  try {
+    const products = await productService.getUserProducts(req.user.id);
+    res.render("pages/my-products.njk", { user: req.user, products });
+  } catch (error) {
+    console.error("Erro ao buscar meus produtos:", error);
+    res.render("pages/my-products.njk", {
+      user: req.user,
+      products: [],
+      error: "Erro ao carregar seus produtos.",
+    });
+  }
+};
+
 export const handleUpvote = async (req, res) => {
   try {
     const { id } = req.params;

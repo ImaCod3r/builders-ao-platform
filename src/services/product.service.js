@@ -69,7 +69,7 @@ export const getPendingProducts = async () => {
   return data;
 };
 
-export const getPublishedProducts = async (userId = null) => {
+export const getPublishedProducts = async (userId = null) => { console.log('GET PUB CALLED WITH:', userId);
   let query = supabase
     .from("products")
     .select("*, upvotes(count)")
@@ -100,6 +100,25 @@ export const getPublishedProducts = async (userId = null) => {
 
   // Sort by upvotes descending
   enrichedProducts.sort((a, b) => b.upvotes_count - a.upvotes_count);
+
+  return enrichedProducts;
+};
+
+export const getUserProducts = async (userId) => {
+  const { data, error } = await supabase
+    .from("products")
+    .select("*, upvotes(count)")
+    .eq("user_id", userId)
+    .order("id", { ascending: false });
+
+  if (error) {
+    throw error;
+  }
+
+  const enrichedProducts = data.map((product) => ({
+    ...product,
+    upvotes_count: product.upvotes[0]?.count || 0,
+  }));
 
   return enrichedProducts;
 };

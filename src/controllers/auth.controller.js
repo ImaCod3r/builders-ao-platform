@@ -43,7 +43,8 @@ export const callback = async (req, res) => {
 
 export const logout = async (req, res) => {
   try {
-    await authService.signOut();
+    const token = req.cookies["sb-access-token"];
+    await authService.signOut(token);
     res.clearCookie("sb-access-token");
     res.clearCookie("sb-refresh-token");
     res.redirect("/");
