@@ -34,11 +34,6 @@ export const callback = async (req, res) => {
       maxAge: session.expires_in * 1000,
     });
 
-    res.cookie("sb-refresh-token", session.refresh_token, {
-      ...cookieOptions,
-      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    });
-
     res.redirect("/");
   } catch (error) {
     console.error("Erro no callback OAuth:", error);
