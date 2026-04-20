@@ -25,7 +25,7 @@
                 Enviar Produto
             </a>
             <a href="#feed" class="text-gray-600 font-semibold hover:text-gray-900 transition-colors flex items-center gap-2 px-8 py-4">
-                Ver Galeria
+                Ver Produtos
                 <i data-lucide="chevron-down" class="w-5 h-5 animate-bounce"></i>
             </a>
         </div>
@@ -59,13 +59,19 @@
                             <!-- Info -->
                             <div class="flex-grow min-w-0">
                                 <h3 class="text-base font-bold text-gray-900 truncate mb-1">{{ project.name }}</h3>
-                                <p class="text-xs text-gray-500 line-clamp-2 leading-relaxed">
-                                    {% if project.taglines %}
-                                        {{ project.taglines.split(',')[0] | trim }}
-                                    {% else %}
-                                        Inovação feita em Angola.
-                                    {% endif %}
-                                </p>
+                                   <!-- Tags & Stats -->
+                            <div class="flex flex-wrap items-center gap-2">
+                                {% if project.taglines %}
+                                    {% set tags = project.taglines.split(',') %}
+                                    {% for tag in tags %}
+                                        {% if loop.index0 < 2 %}
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-gray-50 text-gray-600 border border-gray-100">
+                                                {{ tag | trim }}
+                                            </span>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                            </div>
                             </div>
                         </div>
                     </a>
@@ -114,14 +120,6 @@
                                     </span>
                                 {% endif %}
                             </h3>
-                            
-                            <p class="text-gray-500 text-sm mb-4 line-clamp-1 sm:line-clamp-2 leading-relaxed">
-                                {% if project.taglines %}
-                                    {{ project.taglines }}
-                                {% else %}
-                                    Nenhuma descrição disponível para este produto.
-                                {% endif %}
-                            </p>
 
                             <!-- Tags & Stats -->
                             <div class="flex flex-wrap items-center gap-3">
@@ -135,10 +133,6 @@
                                         {% endif %}
                                     {% endfor %}
                                 {% endif %}
-                                <div class="flex items-center gap-1.5 text-gray-400 text-xs ml-auto sm:ml-0">
-                                    <i data-lucide="message-square" class="w-3.5 h-3.5"></i>
-                                    <span>24</span>
-                                </div>
                             </div>
                         </div>
 

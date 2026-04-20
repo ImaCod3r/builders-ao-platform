@@ -1,6 +1,7 @@
 import { Router } from "express";
 import auth from "./auth.routes.js";
 import admin from "./admin.routes.js";
+import user from "./user.routes.js";
 import { checkAuth } from "../middlewares/checkAuth.js";
 import productRouter from "./product.routes.js";
 import { getPublishedProducts } from "../services/product.service.js";
@@ -29,6 +30,7 @@ indexRouter.get("/login", (req, res) => {
 
 indexRouter.use("/auth", auth);
 indexRouter.use("/admin", checkAuth, admin);
+indexRouter.use("/", user);
 indexRouter.use("/", productRouter);
 
 export default indexRouter;

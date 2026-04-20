@@ -85,7 +85,7 @@
                                 <p class="text-xs font-semibold text-gray-900 leading-tight truncate max-w-[120px]">{{ user.user_metadata.full_name | default(user.email) }}</p>
                                 <p class="text-[10px] text-gray-500 leading-tight">Membro</p>
                             </div>
-                            <a href="/my-products" title="Meus Produtos" class="focus:outline-none">
+                            <a href="/profile" title="Meu Perfil" class="focus:outline-none relative group">
                                 <img src="{{ user.user_metadata.avatar_url | default('https://ui-avatars.com/api/?name=' + user.email + '&background=random') }}" 
                                      alt="Avatar" 
                                      class="w-9 h-9 rounded-full border border-gray-200 p-0.5 object-cover transition-transform hover:scale-105">
