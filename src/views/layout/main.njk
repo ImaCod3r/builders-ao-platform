@@ -36,12 +36,19 @@
             
             <nav class="flex items-center gap-4">
                 {% if user %}
-                    <span class="text-sm font-medium mr-2">Olá, {{ user.name | default('Usuário') }}</span>
-                    <a href="/submit" class="text-sm border border-brand-white px-3 py-1 rounded hover:bg-brand-white hover:text-brand-red transition">Enviar Logo</a>
+                    <!-- Foto e Nome do Usuário -->
+                    <div class="flex items-center gap-2 mr-2">
+                        <img src="{{ user.user_metadata.avatar_url | default('https://ui-avatars.com/api/?name=' + user.email + '&background=random') }}" alt="Avatar" class="w-8 h-8 rounded-full border-2 border-brand-white object-cover shadow-sm">
+                        <span class="text-sm font-medium hidden sm:block truncate max-w-[120px]">{{ user.user_metadata.full_name | default(user.email) }}</span>
+                    </div>
+
+                    <a href="/submit" class="text-sm border border-brand-white px-3 py-1 rounded hover:bg-brand-white hover:text-brand-red transition">Novo</a>
+                    
                     {% if user.role == 'admin' %}
                         <a href="/admin/dashboard" class="text-sm border border-brand-white px-3 py-1 rounded hover:bg-brand-white hover:text-brand-red transition">Admin</a>
                     {% endif %}
-                    <a href="/auth/logout" class="bg-brand-white text-brand-red px-4 py-2 rounded-md font-bold hover:bg-gray-100 transition shadow">Sair</a>
+                    
+                    <a href="/auth/logout" class="bg-brand-white text-brand-red px-4 py-1.5 rounded-md text-sm font-bold hover:bg-gray-100 transition shadow">Sair</a>
                 {% else %}
                     <a href="/auth/login" class="bg-brand-white text-brand-red px-5 py-2 rounded-md font-bold hover:bg-gray-100 transition shadow flex items-center gap-2">
                         <!-- Google G Icon simplified -->
