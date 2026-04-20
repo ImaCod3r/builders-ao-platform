@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Builders AO Platform{% endblock %}</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            red: '#dc2626',      /* Tailwind red-600 */
+                            darkred: '#991b1b',  /* Tailwind red-800 */
+                            white: '#ffffff',
+                            light: '#fef2f2'     /* Tailwind red-50 */
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-brand-light text-gray-900 font-sans min-h-screen flex flex-col">
+    
+    <!-- Cabeçalho (Header) - Vermelho e Branco -->
+    <header class="bg-brand-red text-brand-white shadow-md">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="/" class="text-2xl font-extrabold tracking-tight flex items-center gap-2">
+                <!-- Ícone placeholder -->
+                <svg class="w-8 h-8 text-brand-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 7.5L3.5 7 12 4.5 20.5 7 12 9.5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                Builders AO
+            </a>
+            
+            <nav class="flex items-center gap-4">
+                {% if user %}
+                    <span class="text-sm font-medium mr-2">Olá, {{ user.name | default('Usuário') }}</span>
+                    <a href="/submit" class="text-sm border border-brand-white px-3 py-1 rounded hover:bg-brand-white hover:text-brand-red transition">Enviar Logo</a>
+                    {% if user.role == 'admin' %}
+                        <a href="/admin/dashboard" class="text-sm border border-brand-white px-3 py-1 rounded hover:bg-brand-white hover:text-brand-red transition">Admin</a>
+                    {% endif %}
+                    <a href="/auth/logout" class="bg-brand-white text-brand-red px-4 py-2 rounded-md font-bold hover:bg-gray-100 transition shadow">Sair</a>
+                {% else %}
+                    <a href="/auth/login" class="bg-brand-white text-brand-red px-5 py-2 rounded-md font-bold hover:bg-gray-100 transition shadow flex items-center gap-2">
+                        <!-- Google G Icon simplified -->
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0 5.665 0 .24 5.373.24 12s5.425 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/></svg>
+                        Entrar com Google
+                    </a>
+                {% endif %}
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="flex-grow container mx-auto px-4 py-10">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Rodapé (Footer) -->
+    <footer class="bg-brand-darkred text-brand-white text-center py-6 mt-auto">
+        <div class="container mx-auto px-4">
+            <p class="text-sm">&copy; 2026 Builders AO. Construindo o futuro.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
