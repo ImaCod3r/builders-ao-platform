@@ -23,7 +23,7 @@ Siga estritamente a arquitetura MVC organizada da seguinte forma:
 2. Segurança: Somente o user com role admin pode acessar as rotas /admin/*.
 3. Listagem: A Home Page deve exibir apenas itens com status 'published'.
 4. Autenticação: Use Supabase Auth com persistência de sessão via Cookies (HttpOnly).
-5. Sistema de upvote e downvote e listagem rankeada baseada no número de upvotes.
+5. Sistema de upvote e listagem rankeada baseada no número de upvotes.
 
 # Estilo de Código
 - Código limpo, modular e comentado em português.
