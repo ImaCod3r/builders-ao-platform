@@ -40,7 +40,26 @@
                 </div>
             </div>
 
-            <!-- Grid de Inputs -->
+            <!-- Product Shots Section -->
+            <div class="space-y-4">
+                <label class="text-sm font-bold text-gray-700 tracking-tight flex items-center gap-2">
+                    <i data-lucide="gallery-thumbnails" class="w-4 h-4 text-brand-red"></i>
+                    Screenshots / Product Shots
+                </label>
+                <div class="p-6 border-2 border-dashed border-gray-100 rounded-3xl bg-gray-50/30 group transition-all hover:border-gray-200">
+                    <div id="shots-preview-container" class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-4 hidden">
+                        <!-- Previews will appear here -->
+                    </div>
+                    <label class="flex flex-col items-center justify-center py-8 cursor-pointer group/label">
+                        <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-gray-100 group-hover/label:scale-110 transition-transform">
+                            <i data-lucide="plus" class="w-6 h-6 text-brand-red"></i>
+                        </div>
+                        <p class="mt-4 text-sm font-bold text-gray-700">Adicionar fotos do produto</p>
+                        <p class="mt-1 text-[10px] text-gray-400 uppercase tracking-widest font-medium">Até 5 imagens • Máx 2MB cada</p>
+                        <input type="file" id="images-input" name="images" accept="image/*" multiple class="sr-only"/>
+                    </label>
+                </div>
+            </div>
             <div class="grid grid-cols-1 gap-6">
                 <!-- Nome do Projeto -->
                 <div class="space-y-2">
@@ -110,6 +129,28 @@
         } else {
             logoPreview.src = "";
             container.removeAttribute('data-has-file');
+        }
+    });
+    
+    const imagesInput = document.getElementById('images-input');
+    const shotsPreviewContainer = document.getElementById('shots-preview-container');
+
+    imagesInput.addEventListener('change', function() {
+        shotsPreviewContainer.innerHTML = '';
+        if (this.files && this.files.length > 0) {
+            shotsPreviewContainer.classList.remove('hidden');
+            Array.from(this.files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.className = 'aspect-video rounded-xl overflow-hidden border border-gray-100 bg-white shadow-sm';
+                    div.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover">`;
+                    shotsPreviewContainer.appendChild(div);
+                }
+                reader.readAsDataURL(file);
+            });
+        } else {
+            shotsPreviewContainer.classList.add('hidden');
         }
     });
 </script>

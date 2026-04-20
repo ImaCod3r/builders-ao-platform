@@ -25,6 +25,43 @@ export const uploadLogo = async (file) => {
   return publicUrl;
 };
 
+export const uploadProductImages = async (files) => {
+  const uploadPromises = files.map(async (file) => {
+    const fileExt = file.originalname.split(".").pop();
+    const fileName = `${crypto.randomUUID()}.${fileExt}`;
+    const filePath = `${fileName}`;
+
+    const { data, error } = await supabase.storage
+      .from("products-images")
+      .upload(filePath, file.buffer, {
+        contentType: file.mimetype,
+        upsert: false,
+      });
+
+    if (error) throw error;
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("products-images").getPublicUrl(filePath);
+
+    return publicUrl;
+  });
+
+  return Promise.all(uploadPromises);
+};
+
+export const saveProductImages = async (productId, urls) => {
+  const imageRecords = urls.map((url, index) => ({
+    product_id: productId,
+    url: url,
+    sort_order: index,
+  }));
+
+  const { error } = await supabase.from("product_images").insert(imageRecords);
+
+  if (error) throw error;
+};
+
 export const createProduct = async (productData) => {
   // Generate slug from name
   const slug = productData.name
@@ -75,7 +112,7 @@ export const getProductById = async (id, userId = null) => {
 export const getProductBySlug = async (slug, userId = null) => {
   let query = supabase
     .from("products")
-    .select("*, upvotes(count)")
+    .select("*, upvotes(count), product_images(*)")
     .eq("slug", slug)
     .single();
 

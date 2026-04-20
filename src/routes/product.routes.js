@@ -15,15 +15,20 @@ import {
 const upload = multer({ storage: multer.memoryStorage() });
 const productRouter = Router();
 
+const productUpload = upload.fields([
+  { name: "logo", maxCount: 1 },
+  { name: "images", maxCount: 5 },
+]);
+
 productRouter.get("/product/:slug", renderProductPage);
 productRouter.get("/submit", checkAuth, renderSubmitPage);
 productRouter.get("/my-products", checkAuth, renderMyProductsPage);
-productRouter.post("/submit", checkAuth, upload.single("logo"), submitProduct);
+productRouter.post("/submit", checkAuth, productUpload, submitProduct);
 productRouter.get("/edit-product/:id", checkAuth, renderEditPage);
 productRouter.post(
   "/edit-product/:id",
   checkAuth,
-  upload.single("logo"),
+  productUpload,
   editProduct,
 );
 productRouter.post("/products/:id/upvote", checkAuth, handleUpvote);

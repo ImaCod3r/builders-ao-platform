@@ -77,11 +77,12 @@ export const editProduct = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, url, taglines, description } = req.body;
-    const file = req.file;
+    const logoFile = req.files["logo"] ? req.files["logo"][0] : null;
+    const imageFiles = req.files["images"] || [];
 
     let logoUrl;
-    if (file) {
-      logoUrl = await productService.uploadLogo(file);
+    if (logoFile) {
+      logoUrl = await productService.uploadLogo(logoFile);
     }
 
     await productService.updateProduct(id, req.user.id, {
@@ -92,13 +93,17 @@ export const editProduct = async (req, res) => {
       logo_url: logoUrl,
     });
 
+    if (imageFiles.length > 0) {
+      const imageUrls = await productService.uploadProductImages(imageFiles);
+      await productService.saveProductImages(id, imageUrls);
+    }
+
     res.redirect(
       "/my-products?success=" +
         encodeURIComponent("Projeto atualizado com sucesso!"),
     );
   } catch (error) {
     console.error("Erro ao atualizar projeto:", error);
-    // Para simplificar a exibição de erro, pegamos os dados de volta do banco
     const product = await productService.getProductById(
       req.params.id,
       req.user.id,
@@ -114,16 +119,17 @@ export const editProduct = async (req, res) => {
 export const submitProduct = async (req, res) => {
   try {
     const { name, url, taglines, description } = req.body;
-    const file = req.file;
+    const logoFile = req.files["logo"] ? req.files["logo"][0] : null;
+    const imageFiles = req.files["images"] || [];
 
-    if (!file) {
+    if (!logoFile) {
       return res.render("pages/submit.njk", {
         user: req.user,
         error: "A logo é obrigatória.",
       });
     }
 
-    const logoUrl = await productService.uploadLogo(file);
+    const logoUrl = await productService.uploadLogo(logoFile);
 
     const newProduct = await productService.createProduct({
       name,
@@ -133,6 +139,11 @@ export const submitProduct = async (req, res) => {
       logo_url: logoUrl,
       user_id: req.user.id,
     });
+
+    if (imageFiles.length > 0) {
+      const imageUrls = await productService.uploadProductImages(imageFiles);
+      await productService.saveProductImages(newProduct.id, imageUrls);
+    }
 
     res.redirect(
       "/?success=" + encodeURIComponent("Projeto enviado com sucesso!"),
