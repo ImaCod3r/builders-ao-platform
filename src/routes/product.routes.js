@@ -6,14 +6,25 @@ import {
   renderMyProductsPage,
   submitProduct,
   handleUpvote,
+  renderEditPage,
+  editProduct,
+  renderProductPage,
 } from "../controllers/product.controller.js";
 
 const upload = multer({ storage: multer.memoryStorage() });
 const productRouter = Router();
 
+productRouter.get("/product/:slug", renderProductPage);
 productRouter.get("/submit", checkAuth, renderSubmitPage);
 productRouter.get("/my-products", checkAuth, renderMyProductsPage);
 productRouter.post("/submit", checkAuth, upload.single("logo"), submitProduct);
+productRouter.get("/edit-product/:id", checkAuth, renderEditPage);
+productRouter.post(
+  "/edit-product/:id",
+  checkAuth,
+  upload.single("logo"),
+  editProduct,
+);
 productRouter.post("/products/:id/upvote", checkAuth, handleUpvote);
 
 export default productRouter;

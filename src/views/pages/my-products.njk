@@ -20,6 +20,12 @@
         </div>
     {% endif %}
 
+    {% if success %}
+        <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6 rounded shadow-sm">
+            <p class="text-green-700 font-medium">{{ success }}</p>
+        </div>
+    {% endif %}
+
     {% if products and products.length > 0 %}
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
@@ -29,6 +35,7 @@
                             <th class="py-4 px-6 font-bold text-gray-600 text-sm uppercase tracking-wider">Produto</th>
                             <th class="py-4 px-6 font-bold text-gray-600 text-sm uppercase tracking-wider">Status</th>
                             <th class="py-4 px-6 font-bold text-gray-600 text-sm uppercase tracking-wider text-center">Upvotes</th>
+                            <th class="py-4 px-6 font-bold text-gray-600 text-sm uppercase tracking-wider text-right">Ações</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -83,6 +90,11 @@
                                     <span class="inline-flex items-center justify-center min-w-[3rem] px-2 py-1 rounded-lg bg-red-50 text-brand-red font-bold">
                                         {{ project.upvotes_count }}
                                     </span>
+                                </td>
+                                <td class="py-4 px-6 text-right">
+                                    <a href="/edit-product/{{ project.id }}" class="text-indigo-600 hover:text-indigo-900 font-medium inline-flex items-center gap-1 transition">
+                                        Editar
+                                    </a>
                                 </td>
                             </tr>
                         {% endfor %}

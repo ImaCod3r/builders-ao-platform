@@ -18,7 +18,7 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {% for project in projects.slice(0, 6) %}
-                    <a href="{{ project.url if project.url else '#' }}" {% if project.url %}target="_blank" rel="noopener noreferrer"{% endif %} class="flex items-center gap-4 bg-white border border-gray-100 p-4 rounded-xl shadow-sm hover:border-brand-red hover:shadow-md transition duration-300">
+                    <a href="/product/{{ project.slug }}" class="flex items-center gap-4 bg-white border border-gray-100 p-4 rounded-xl shadow-sm hover:border-brand-red hover:shadow-md transition duration-300">
                         <!-- Logo -->
                         <div class="w-12 h-12 flex-shrink-0 bg-brand-light rounded-lg flex items-center justify-center border border-gray-50 overflow-hidden">
                             {% if project.logo_url %}
@@ -48,8 +48,10 @@
             <h2 class="text-2xl font-bold text-gray-900 mb-6">Produtos da Comunidade</h2>
             <div class="flex flex-col gap-4">
                 {% for project in projects %}
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition duration-300 flex items-center gap-4 sm:gap-6">
+                    <div class="relative bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition duration-300 flex items-center gap-4 sm:gap-6 group">
                         
+                        <a href="/product/{{ project.slug }}" class="absolute inset-0 z-10"><span class="sr-only">Ver produto {{ project.name }}</span></a>
+
                         <!-- Rank -->
                         <div class="text-brand-red font-bold text-sm w-6 text-center hidden sm:block">
                             #{{ loop.index }}
@@ -66,12 +68,8 @@
 
                         <!-- Infos do Projeto -->
                         <div class="flex-grow py-1">
-                            <h3 class="text-lg sm:text-xl font-bold text-gray-900 leading-tight mb-1">
-                                {% if project.url %}
-                                    <a href="{{ project.url }}" target="_blank" rel="noopener noreferrer" class="hover:text-brand-red transition-colors">{{ project.name }}</a>
-                                {% else %}
-                                    {{ project.name }}
-                                {% endif %}
+                            <h3 class="text-lg sm:text-xl font-bold text-gray-900 leading-tight mb-1 group-hover:text-brand-red transition-colors">
+                                {{ project.name }}
                             </h3>
                             
                             <!-- Descrição / Taglines resumidas como descrição -->
@@ -105,7 +103,7 @@
                         </div>
 
                         <!-- Upvote Section (Right aligned) -->
-                        <div class="flex-shrink-0 ml-2">
+                        <div class="flex-shrink-0 ml-2 relative z-20">
                             <button 
                                 class="upvote-btn flex flex-col items-center justify-center p-2 min-w-[50px] sm:min-w-[60px] border rounded-lg transition-colors {{ 'border-brand-red text-brand-red bg-red-50' if project.has_upvoted else 'border-gray-200 text-gray-500 hover:border-brand-red hover:text-brand-red hover:bg-red-50' }}"
                                 data-id="{{ project.id }}"

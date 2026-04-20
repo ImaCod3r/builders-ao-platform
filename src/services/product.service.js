@@ -40,11 +40,95 @@ export const createProduct = async (productData) => {
     user_id: productData.user_id,
     status: "pending", // Supondo valor inicial do enumerable project_status
     taglines: productData.taglines,
+    description: productData.description,
   };
 
   const { data, error } = await supabase
     .from("products")
     .insert([product])
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+};
+
+export const getProductById = async (id, userId = null) => {
+  let query = supabase.from("products").select("*").eq("id", id).single();
+
+  if (userId) {
+    query = query.eq("user_id", userId);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+};
+
+export const getProductBySlug = async (slug, userId = null) => {
+  let query = supabase
+    .from("products")
+    .select("*, upvotes(count)")
+    .eq("slug", slug)
+    .single();
+
+  const { data: product, error } = await query;
+
+  if (error) {
+    if (error.code === "PGRST116") return null; // Not found
+    throw error;
+  }
+
+  let has_upvoted = false;
+  if (userId) {
+    const { data: upvoteData } = await supabase
+      .from("upvotes")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("product_id", product.id)
+      .maybeSingle();
+
+    if (upvoteData) has_upvoted = true;
+  }
+
+  return {
+    ...product,
+    upvotes_count: product.upvotes[0]?.count || 0,
+    has_upvoted,
+  };
+};
+
+export const updateProduct = async (id, userId, productData) => {
+  const updatePayload = {
+    name: productData.name,
+    url: productData.url,
+    taglines: productData.taglines,
+    description: productData.description,
+  };
+
+  if (productData.name) {
+    updatePayload.slug = productData.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)+/g, "");
+  }
+
+  if (productData.logo_url) {
+    updatePayload.logo_url = productData.logo_url;
+  }
+
+  const { data, error } = await supabase
+    .from("products")
+    .update(updatePayload)
+    .eq("id", id)
+    .eq("user_id", userId)
     .select()
     .single();
 
@@ -69,7 +153,8 @@ export const getPendingProducts = async () => {
   return data;
 };
 
-export const getPublishedProducts = async (userId = null) => { console.log('GET PUB CALLED WITH:', userId);
+export const getPublishedProducts = async (userId = null) => {
+  console.log("GET PUB CALLED WITH:", userId);
   let query = supabase
     .from("products")
     .select("*, upvotes(count)")
