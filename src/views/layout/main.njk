@@ -1,77 +1,186 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Builders AO Platform{% endblock %}</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
                     colors: {
                         brand: {
                             red: '#dc2626',      /* Tailwind red-600 */
                             darkred: '#991b1b',  /* Tailwind red-800 */
                             white: '#ffffff',
-                            light: '#fef2f2'     /* Tailwind red-50 */
+                            light: '#fef2f2',    /* Tailwind red-50 */
+                            border: '#e5e7eb',
                         }
+                    },
+                    borderRadius: {
+                        'xl': '0.75rem',
+                        '2xl': '1rem',
+                    },
+                    boxShadow: {
+                        'premium': '0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)',
                     }
                 }
             }
         }
     </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(8px); }
+        .btn-shadcn {
+            @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-400 disabled:pointer-events-none disabled:opacity-50 border border-gray-200 bg-white shadow-sm hover:bg-gray-100 px-4 py-2;
+        }
+        .btn-brand {
+            @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-red-400 disabled:pointer-events-none disabled:opacity-50 bg-brand-red text-white shadow hover:bg-brand-darkred px-4 py-2;
+        }
+    </style>
 </head>
-<body class="bg-brand-light text-gray-900 font-sans min-h-screen flex flex-col">
+<body class="bg-white text-gray-900 min-h-screen flex flex-col antialiased">
     
-    <!-- Cabeçalho (Header) - Vermelho e Branco -->
-    <header class="bg-brand-red text-brand-white shadow-md">
-        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="/" class="text-2xl font-extrabold tracking-tight flex items-center gap-2">
-                <!-- Ícone placeholder -->
-                <svg class="w-8 h-8 text-brand-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zm0 7.5L3.5 7 12 4.5 20.5 7 12 9.5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                Builders AO
+    <!-- Navegação Estilo Vercel/Shadcn -->
+    <header class="sticky top-0 z-40 w-full border-b border-gray-100 bg-white/80 backdrop-blur-md">
+        <div class="container mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2.5 transition-opacity hover:opacity-90">
+                <div class="bg-brand-red p-1.5 rounded-lg shadow-sm">
+                    <i data-lucide="layers" class="w-5 h-5 text-white"></i>
+                </div>
+                <span class="text-lg font-bold tracking-tight text-gray-900">Builders <span class="text-brand-red">AO</span></span>
             </a>
             
-            <nav class="flex items-center gap-4">
-                {% if user %}
-                    <!-- Foto e Nome do Usuário -->
-                    <div class="flex items-center gap-2 mr-2">
-                        <img src="{{ user.user_metadata.avatar_url | default('https://ui-avatars.com/api/?name=' + user.email + '&background=random') }}" alt="Avatar" class="w-8 h-8 rounded-full border-2 border-brand-white object-cover shadow-sm">
-                        <span class="text-sm font-medium hidden sm:block truncate max-w-[120px]">{{ user.user_metadata.full_name | default(user.email) }}</span>
-                    </div>
+            <nav class="hidden md:flex items-center gap-6">
+                <!-- Links de navegação podem ser adicionados aqui -->
+            </nav>
 
-                    <a href="/my-products" class="text-sm border border-brand-white px-3 py-1 rounded hover:bg-brand-white hover:text-brand-red transition">Meus Produtos</a>
-                    <a href="/submit" class="text-sm border border-brand-white px-3 py-1 rounded hover:bg-brand-white hover:text-brand-red transition">Novo</a>
-                    
-                    {% if user.role == 'admin' %}
-                        <a href="/admin/dashboard" class="text-sm border border-brand-white px-3 py-1 rounded hover:bg-brand-white hover:text-brand-red transition">Admin</a>
-                    {% endif %}
-                    
-                    <a href="/auth/logout" class="bg-brand-white text-brand-red px-4 py-1.5 rounded-md text-sm font-bold hover:bg-gray-100 transition shadow">Sair</a>
+            <div class="flex items-center gap-4">
+                {% if user %}
+                    <div class="flex items-center gap-3">
+                        <a href="/submit" class="hidden sm:flex items-center gap-2 btn-shadcn text-xs px-3 py-1.5 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                            Novo Produto
+                        </a>
+                        
+                        <div class="h-8 w-px bg-gray-100 mx-1"></div>
+                        
+                        <!-- Perfil Dropdown (Simplificado) -->
+                        <div class="flex items-center gap-3">
+                            <div class="text-right hidden lg:block">
+                                <p class="text-xs font-semibold text-gray-900 leading-tight truncate max-w-[120px]">{{ user.user_metadata.full_name | default(user.email) }}</p>
+                                <p class="text-[10px] text-gray-500 leading-tight">Membro</p>
+                            </div>
+                            <a href="/my-products" title="Meus Produtos" class="focus:outline-none">
+                                <img src="{{ user.user_metadata.avatar_url | default('https://ui-avatars.com/api/?name=' + user.email + '&background=random') }}" 
+                                     alt="Avatar" 
+                                     class="w-9 h-9 rounded-full border border-gray-200 p-0.5 object-cover transition-transform hover:scale-105">
+                            </a>
+                            <a href="/auth/logout" class="p-2 text-gray-400 hover:text-brand-red transition-colors" title="Sair">
+                                <i data-lucide="log-out" class="w-5 h-5"></i>
+                            </a>
+                        </div>
+                    </div>
                 {% else %}
-                    <a href="/auth/login" class="bg-brand-white text-brand-red px-5 py-2 rounded-md font-bold hover:bg-gray-100 transition shadow flex items-center gap-2">
-                        <!-- Google G Icon simplified -->
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0 5.665 0 .24 5.373.24 12s5.425 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/></svg>
+                    <a href="/auth/login" class="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-black transition shadow-lg">
+                        <i data-lucide="log-in" class="w-4 h-4"></i>
                         Entrar com Google
                     </a>
                 {% endif %}
-            </nav>
+            </div>
         </div>
     </header>
 
     <!-- Conteúdo Principal -->
-    <main class="flex-grow container mx-auto px-4 py-10">
+    <main class="flex-grow">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Rodapé (Footer) -->
-    <footer class="bg-brand-darkred text-brand-white text-center py-6 mt-auto">
+    <!-- Rodapé Minimalista -->
+    <footer class="border-t border-gray-100 bg-white py-12">
         <div class="container mx-auto px-4">
-            <p class="text-sm">&copy; 2026 Builders AO. Construindo o futuro.</p>
+            <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="layers" class="w-5 h-5 text-gray-400"></i>
+                    <span class="font-bold text-gray-400">Builders AO</span>
+                </div>
+                <p class="text-sm text-gray-500">&copy; 2026 Builders AO. Todos os direitos reservados.</p>
+                <div class="flex gap-6 text-gray-400">
+                    <a href="#" class="hover:text-brand-red transition-colors"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                    <a href="#" class="hover:text-brand-red transition-colors"><i data-lucide="github" class="w-5 h-5"></i></a>
+                </div>
+            </div>
         </div>
     </footer>
 
+    <!-- Global Modal Structure -->
+    <div id="global-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-premium max-w-sm w-full overflow-hidden transform transition-all scale-95 opacity-0" id="modal-content">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-brand-light rounded-full flex items-center justify-center mx-auto mb-4 text-brand-red">
+                    <i data-lucide="lock" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2" id="modal-title">Ação Necessária</h3>
+                <p class="text-gray-500 mb-6" id="modal-description">Você precisa estar logado para realizar esta ação.</p>
+                <div class="flex flex-col gap-3">
+                    <a href="/auth/login" class="w-full bg-gray-900 text-white px-4 py-3 rounded-xl font-bold hover:bg-black transition flex items-center justify-center gap-2">
+                        <i data-lucide="log-in" class="w-5 h-5"></i>
+                        Entrar com Google
+                    </a>
+                    <button onclick="closeModal()" class="w-full text-gray-500 text-sm font-medium hover:text-gray-900 transition mt-2">
+                        Talvez depois
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Modal Functions
+        function openModal(title, description) {
+            const modal = document.getElementById('global-modal');
+            const content = document.getElementById('modal-content');
+            if (title) document.getElementById('modal-title').textContent = title;
+            if (description) document.getElementById('modal-description').textContent = description;
+            
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('global-modal');
+            const content = document.getElementById('modal-content');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        // Close modal on click outside
+        document.getElementById('global-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'global-modal') closeModal();
+        });
+    </script>
 </body>
 </html>

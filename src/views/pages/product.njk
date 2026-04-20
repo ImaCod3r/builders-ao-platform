@@ -3,73 +3,93 @@
 {% block title %}{{ product.name }} - Builders AO{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-8 mb-8 relative">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-8">
-            
-            <!-- Logo Section -->
-            <div class="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 bg-brand-light rounded-2xl flex items-center justify-center border border-gray-50 overflow-hidden shadow-sm">
-                {% if product.logo_url %}
-                    <img src="{{ product.logo_url }}" alt="Logo {{ product.name }}" class="max-h-full max-w-full object-contain">
-                {% else %}
-                    <span class="text-brand-red opacity-50 font-bold text-sm uppercase text-center leading-tight">Sem Logo</span>
-                {% endif %}
-            </div>
+<div class="max-w-4xl mx-auto py-12 px-4 sm:px-6">
+    
+    <!-- Breadcrumbs -->
+    <nav class="flex mb-8 text-sm font-medium text-gray-500 items-center gap-2">
+        <a href="/" class="hover:text-brand-red transition-colors">Início</a>
+        <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        <span class="text-gray-900">{{ product.name }}</span>
+    </nav>
 
-            <!-- Details Section -->
-            <div class="flex-grow w-full">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
-                    <div>
-                        <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-2">{{ product.name }}</h1>
-                        <p class="text-lg text-gray-600 mb-4">{{ product.taglines }}</p>
-                        
-                        <div class="flex flex-wrap items-center gap-2">
-                            {% if product.taglines %}
-                                {% set tags = product.taglines.split(',') %}
-                                {% for tag in tags %}
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
-                                        {{ tag | trim }}
-                                    </span>
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                    </div>
+    <div class="bg-white rounded-3xl shadow-premium border border-gray-100 overflow-hidden">
+        <!-- Header Section -->
+        <div class="p-8 sm:p-12">
+            <div class="flex flex-col md:flex-row items-start gap-8">
+                
+                <!-- Logo Section -->
+                <div class="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 bg-gray-50 rounded-2xl flex items-center justify-center border border-gray-100 overflow-hidden shadow-sm">
+                    {% if product.logo_url %}
+                        <img src="{{ product.logo_url }}" alt="Logo {{ product.name }}" class="max-h-full max-w-full object-cover">
+                    {% else %}
+                        <i data-lucide="package" class="w-12 h-12 text-gray-200"></i>
+                    {% endif %}
+                </div>
 
-                    <!-- Right Action Section -->
-                    <div class="flex sm:flex-col items-center sm:items-end gap-4 mt-4 sm:mt-0 w-full sm:w-auto">
-                        <!-- Upvote Box -->
-                        <button 
-                            class="upvote-btn flex flex-col items-center justify-center py-3 px-6 sm:px-8 border-2 rounded-xl transition-all shadow-sm {% if user %}{{ 'border-brand-red text-brand-red bg-red-50 hover:bg-red-100' if product.has_upvoted else 'border-gray-200 text-gray-600 hover:border-brand-red hover:text-brand-red hover:bg-red-50' }}{% else %}border-gray-200 text-gray-400 cursor-not-allowed{% endif %}"
-                            data-id="{{ product.id }}"
-                            aria-label="Upvote">
-                            <svg class="w-6 h-6 sm:w-8 sm:h-8 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"></path>
-                            </svg>
-                            <span class="font-extrabold text-lg sm:text-xl upvote-count">{{ product.upvotes_count }}</span>
-                        </button>
-                        
-                        {% if product.url %}
-                            <a href="{{ product.url }}" target="_blank" rel="noopener noreferrer" class="mt-0 sm:mt-2 w-full sm:w-auto text-center px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-xl font-bold transition shadow-md">
-                                Visitar Projeto
-                            </a>
+                <!-- Info Section -->
+                <div class="flex-grow space-y-4">
+                    <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">{{ product.name }}</h1>
+                    <p class="text-xl text-gray-500 font-medium leading-relaxed">{{ product.taglines }}</p>
+                    
+                    <div class="flex flex-wrap items-center gap-2 pt-2">
+                        {% if product.taglines %}
+                            {% set tags = product.taglines.split(',') %}
+                            {% for tag in tags %}
+                                <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold bg-gray-50 text-gray-600 border border-gray-100">
+                                    {{ tag | trim }}
+                                </span>
+                            {% endfor %}
                         {% endif %}
                     </div>
+                </div>
+
+                <!-- Action Button -->
+                <div class="w-full md:w-auto flex flex-col gap-3">
+                    <button 
+                        class="upvote-btn w-full flex items-center justify-center gap-3 py-4 px-8 rounded-2xl border-2 transition-all duration-200 font-bold {{ 'border-brand-red bg-brand-light text-brand-red' if product.has_upvoted else 'border-gray-100 bg-white text-gray-400 hover:border-brand-red hover:text-brand-red hover:bg-brand-light' }}"
+                        data-id="{{ product.id }}"
+                        data-is-logged="{{ 'true' if user else 'false' }}"
+                        aria-label="Upvote">
+                        <i data-lucide="chevron-up" class="w-6 h-6 {{ 'animate-bounce' if not product.has_upvoted }}"></i>
+                        <span class="text-xl upvote-count">{{ product.upvotes_count }}</span>
+                    </button>
+                    
+                    {% if product.url %}
+                        <a href="{{ product.url }}" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center gap-2 px-8 py-4 bg-gray-900 border border-transparent text-white rounded-2xl font-bold hover:bg-black transition-all shadow-lg hover:shadow-xl active:scale-95">
+                            Visitar Projeto
+                            <i data-lucide="external-link" class="w-4 h-4"></i>
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
 
-        <hr class="border-gray-100 mb-8">
+        <!-- Content Divider -->
+        <div class="h-px bg-gradient-to-r from-transparent via-gray-100 to-transparent mx-8"></div>
 
-        <!-- Descrição Section -->
-        <div>
-            <h2 class="text-2xl font-bold text-gray-900 mb-4">Sobre o projeto</h2>
-            <div class="prose max-w-none text-gray-600 leading-relaxed whitespace-pre-wrap">{% if product.description %}{{ product.description }}{% else %}<p class="italic text-gray-400">O criador deste projeto ainda não forneceu uma descrição detalhada.</p>{% endif %}</div>
+        <!-- Description Section -->
+        <div class="p-8 sm:p-12 space-y-6">
+            <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <i data-lucide="text-quote" class="w-6 h-6 text-brand-red"></i>
+                Sobre o projeto
+            </h2>
+            <div class="prose max-w-none text-gray-600 leading-relaxed text-lg whitespace-pre-line">
+                {% if product.description %}
+                    {{ product.description }}
+                {% else %}
+                    <div class="bg-gray-50 rounded-2xl p-8 text-center border border-dashed border-gray-200 uppercase tracking-widest text-xs font-bold text-gray-400">
+                        Nenhuma descrição fornecida pelo autor.
+                    </div>
+                {% endif %}
+            </div>
         </div>
-
     </div>
     
-    <div class="mt-6 flex justify-center">
-        <a href="/" class="text-brand-red hover:text-brand-darkred font-semibold transition">&larr; Voltar para a comunidade</a>
+    <div class="mt-12 flex justify-center">
+        <a href="/" class="flex items-center gap-2 text-gray-500 hover:text-brand-red font-bold transition-colors py-2 px-4 rounded-xl hover:bg-brand-light">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            Voltar para a comunidade
+        </a>
     </div>
 </div>
 
@@ -77,27 +97,35 @@
 document.addEventListener('DOMContentLoaded', () => {
     const upvoteBtn = document.querySelector('.upvote-btn');
     
-    if (upvoteBtn && !upvoteBtn.classList.contains('cursor-not-allowed')) {
+    if (upvoteBtn) {
         upvoteBtn.addEventListener('click', async (e) => {
-            const currentBtn = e.target.closest('button');
+            const currentBtn = e.currentTarget;
             const productId = currentBtn.dataset.id;
+            const isLogged = currentBtn.dataset.isLogged === 'true';
+
+            if (!isLogged) {
+                openModal(
+                    'Apoie este Projeto', 
+                    'Faça login para dar o seu upvote e ajudar este builder a crescer na nossa comunidade.'
+                );
+                return;
+            }
             
+            // Add loading state
+            currentBtn.classList.add('opacity-50', 'pointer-events-none');
+
             try {
                 const response = await fetch(`/products/${productId}/upvote`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+                    headers: { 'Content-Type': 'application/json' }
                 });
 
                 if (response.status === 401 || response.status === 403) {
-                    window.location.href = '/login?error=' + encodeURIComponent('Faça login para dar upvote.');
+                    openModal('Sessão Expirada', 'Por favor, faça login novamente para continuar.');
                     return;
                 }
 
-                if (!response.ok) {
-                    throw new Error('Falha ao processar upvote');
-                }
+                if (!response.ok) throw new Error('Falha ao processar upvote');
 
                 const data = await response.json();
                 
@@ -105,20 +133,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 countSpan.textContent = data.count;
                 
                 if (data.action === 'added') {
-                    currentBtn.classList.remove('text-gray-600', 'border-gray-200', 'hover:bg-red-50');
-                    currentBtn.classList.add('text-brand-red', 'border-brand-red', 'bg-red-50', 'hover:bg-red-100');
+                    currentBtn.classList.remove('border-gray-100', 'bg-white', 'text-gray-400');
+                    currentBtn.classList.add('border-brand-red', 'bg-brand-light', 'text-brand-red');
                 } else if (data.action === 'removed') {
-                    currentBtn.classList.remove('text-brand-red', 'border-brand-red', 'bg-red-50', 'hover:bg-red-100');
-                    currentBtn.classList.add('text-gray-600', 'border-gray-200', 'hover:border-brand-red', 'hover:text-brand-red', 'hover:bg-red-50');
+                    currentBtn.classList.remove('border-brand-red', 'bg-brand-light', 'text-brand-red');
+                    currentBtn.classList.add('border-gray-100', 'bg-white', 'text-gray-400');
                 }
             } catch (error) {
                 console.error(error);
                 alert('Erro ao processar o seu upvote.');
+            } finally {
+                currentBtn.classList.remove('opacity-50', 'pointer-events-none');
             }
-        });
-    } else if (upvoteBtn && upvoteBtn.classList.contains('cursor-not-allowed')) {
-        upvoteBtn.addEventListener('click', () => {
-            window.location.href = '/login?error=' + encodeURIComponent('Faça login para dar upvote.');
         });
     }
 });
