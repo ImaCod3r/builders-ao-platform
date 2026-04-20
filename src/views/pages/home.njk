@@ -10,36 +10,63 @@
     </p>
 </div>
 
-<!-- Grid de Projetos Aprovados -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+<!-- Lista de Projetos Aprovados -->
+<div class="max-w-4xl mx-auto space-y-6">
     {% if projects and projects.length > 0 %}
         {% for project in projects %}
-            <div class="bg-white rounded-xl shadow-lg border border-red-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition duration-300">
+            <div class="bg-white rounded-xl shadow-md border border-gray-100 p-4 hover:shadow-lg transition duration-300 flex items-center gap-6 relative">
                 
-                <!-- Container da Logo -->
-                <div class="h-48 bg-brand-light flex items-center justify-center border-b border-red-50 p-4">
-                    {% if project.logoUrl %}
-                        <img src="{{ project.logoUrl }}" alt="Logo {{ project.name }}" class="max-h-full max-w-full object-contain">
+                <!-- Upvote Section -->
+                <div class="flex flex-col items-center justify-center min-w-[60px] border-r border-gray-100 pr-4">
+                    <button 
+                        class="upvote-btn flex flex-col items-center justify-center p-2 rounded-lg transition-colors {{ 'text-brand-red bg-red-50' if project.has_upvoted else 'text-gray-400 hover:bg-gray-50 hover:text-brand-red' }}"
+                        data-id="{{ project.id }}"
+                        aria-label="Upvote">
+                        <svg class="w-6 h-6 mb-1" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clip-rule="evenodd" />
+                        </svg>
+                        <span class="font-bold text-lg upvote-count">{{ project.upvotes_count }}</span>
+                    </button>
+                </div>
+
+                <!-- Logo Section -->
+                <div class="w-24 h-24 flex-shrink-0 bg-brand-light rounded-lg flex items-center justify-center border border-gray-50 overflow-hidden">
+                    {% if project.logo_url %}
+                        <img src="{{ project.logo_url }}" alt="Logo {{ project.name }}" class="max-h-full max-w-full object-contain">
                     {% else %}
-                        <span class="text-brand-red opacity-50 font-bold text-xl">Sem Logo</span>
+                        <span class="text-brand-red opacity-50 font-bold text-xs uppercase text-center leading-tight">Sem Logo</span>
                     {% endif %}
                 </div>
 
                 <!-- Infos do Projeto -->
-                <div class="p-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-2">{{ project.name }}</h2>
-                    <p class="text-gray-600 text-sm line-clamp-3 mb-4">
-                        {{ project.description }}
-                    </p>
+                <div class="flex-grow py-2">
+                    <h2 class="text-xl font-bold text-gray-900 mb-1">
+                        {% if project.url %}
+                            <a href="{{ project.url }}" target="_blank" rel="noopener noreferrer" class="hover:text-brand-red transition-colors">{{ project.name }}</a>
+                        {% else %}
+                            {{ project.name }}
+                        {% endif %}
+                    </h2>
                     
-                    <div class="pt-4 border-t border-gray-100 flex justify-between items-center">
-                        <span class="inline-block px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full">
+                    <div class="flex flex-wrap gap-2 mb-3">
+                        {% if project.taglines %}
+                            {% set tags = project.taglines.split(',') %}
+                            {% for tag in tags %}
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
+                                    {{ tag | trim }}
+                                </span>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="flex items-center text-sm text-gray-500">
+                        <span class="inline-block px-2 py-0.5 bg-green-100 text-green-700 text-xs font-semibold rounded mr-3">
                             Aprovado
                         </span>
-                        {% if project.link %}
-                            <a href="{{ project.link }}" target="_blank" rel="noopener noreferrer" class="text-brand-red hover:text-brand-darkred text-sm font-semibold flex items-center gap-1">
-                                Visitar <span>&rarr;</span>
-                            </a>
+                        {% if project.url %}
+                        <a href="{{ project.url }}" target="_blank" rel="noopener noreferrer" class="text-gray-500 hover:text-brand-red inline-flex items-center gap-1 transition-colors">
+                            Visitar <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        </a>
                         {% endif %}
                     </div>
                 </div>
@@ -53,4 +80,55 @@
         </div>
     {% endif %}
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const upvoteBtns = document.querySelectorAll('.upvote-btn');
+    
+    upvoteBtns.forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            // Prevent default just in case, and find closest btn if inner icon clicked
+            const currentBtn = e.target.closest('button');
+            const productId = currentBtn.dataset.id;
+            
+            try {
+                const response = await fetch(`/products/${productId}/upvote`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    // Redirect to login or show alert
+                    window.location.href = '/login?error=' + encodeURIComponent('Faça login para dar upvote.');
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error('Falha ao processar upvote');
+                }
+
+                const data = await response.json();
+                
+                // Update UI based on action
+                const countSpan = currentBtn.querySelector('.upvote-count');
+                countSpan.textContent = data.count;
+                
+                if (data.action === 'added') {
+                    currentBtn.classList.remove('text-gray-400', 'hover:bg-gray-50', 'hover:text-brand-red');
+                    currentBtn.classList.add('text-brand-red', 'bg-red-50');
+                } else if (data.action === 'removed') {
+                    currentBtn.classList.remove('text-brand-red', 'bg-red-50');
+                    currentBtn.classList.add('text-gray-400', 'hover:bg-gray-50', 'hover:text-brand-red');
+                }
+            } catch (error) {
+                console.error(error);
+                alert('Erro ao processar o seu upvote.');
+            }
+        });
+    });
+});
+</script>
+
 {% endblock %}

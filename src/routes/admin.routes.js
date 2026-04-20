@@ -31,7 +31,7 @@ router.get("/dashboard", async (req, res) => {
 router.post("/projects/:id/approve", async (req, res) => {
   try {
     await updateProductStatus(req.params.id, "published");
-    res.redirect("/admin/dashboard?success=approved");
+    res.redirect("/admin/dashboard?success=published");
   } catch (error) {
     console.error("Aprovar erro:", error);
     res.redirect("/admin/dashboard?error=Erro ao aprovar");

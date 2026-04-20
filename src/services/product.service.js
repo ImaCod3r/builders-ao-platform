@@ -69,6 +69,41 @@ export const getPendingProducts = async () => {
   return data;
 };
 
+export const getPublishedProducts = async (userId = null) => {
+  let query = supabase
+    .from("products")
+    .select("*, upvotes(count)")
+    .eq("status", "published");
+
+  const { data: products, error } = await query;
+
+  if (error) {
+    throw error;
+  }
+
+  let userUpvotes = [];
+  if (userId) {
+    const { data: upvotesData } = await supabase
+      .from("upvotes")
+      .select("product_id")
+      .eq("user_id", userId);
+    if (upvotesData) {
+      userUpvotes = upvotesData.map((u) => u.product_id);
+    }
+  }
+
+  const enrichedProducts = products.map((product) => ({
+    ...product,
+    upvotes_count: product.upvotes[0]?.count || 0,
+    has_upvoted: userUpvotes.includes(product.id),
+  }));
+
+  // Sort by upvotes descending
+  enrichedProducts.sort((a, b) => b.upvotes_count - a.upvotes_count);
+
+  return enrichedProducts;
+};
+
 export const updateProductStatus = async (id, status) => {
   const { data, error } = await supabase
     .from("products")
@@ -82,4 +117,45 @@ export const updateProductStatus = async (id, status) => {
   }
 
   return data;
+};
+
+export const toggleUpvote = async (userId, productId) => {
+  // Check if upvote exists
+  const { data: existingUpvote, error: fetchError } = await supabase
+    .from("upvotes")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("product_id", productId)
+    .maybeSingle();
+
+  if (fetchError) throw fetchError;
+
+  let action = "";
+  if (existingUpvote) {
+    // Remove upvote
+    const { error: deleteError } = await supabase
+      .from("upvotes")
+      .delete()
+      .eq("user_id", userId)
+      .eq("product_id", productId);
+    if (deleteError) throw deleteError;
+    action = "removed";
+  } else {
+    // Add upvote
+    const { error: insertError } = await supabase
+      .from("upvotes")
+      .insert([{ user_id: userId, product_id: productId }]);
+    if (insertError) throw insertError;
+    action = "added";
+  }
+
+  // Get new count
+  const { count, error: countError } = await supabase
+    .from("upvotes")
+    .select("*", { count: "exact", head: true })
+    .eq("product_id", productId);
+
+  if (countError) throw countError;
+
+  return { action, count };
 };
