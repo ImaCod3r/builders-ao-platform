@@ -108,7 +108,7 @@
     logoInput.addEventListener('change', function() {
         if (this.files && this.files[0]) {
             if (this.files[0].size > MAX_SIZE) {
-                alert('A logo excede o tamanho máximo de 2MB. Por favor, escolha uma imagem menor.');
+                showToast('A logo excede o tamanho máximo de 2MB. Escolha uma imagem menor.', 'error');
                 this.value = '';
                 return;
             }
@@ -128,7 +128,7 @@
         if (this.files && this.files.length > 0) {
             const hasLargeFile = Array.from(this.files).some(file => file.size > MAX_SIZE);
             if (hasLargeFile) {
-                alert('Uma ou mais imagens excedem o tamanho máximo de 2MB. Por favor, escolha imagens menores.');
+                showToast('Uma ou mais imagens excedem o máximo de 2MB. Escolha imagens menores.', 'error');
                 this.value = '';
                 shotsPreviewContainer.classList.add('hidden');
                 return;
