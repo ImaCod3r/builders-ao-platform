@@ -114,12 +114,21 @@
 </div>
 
 <script>
+    const MAX_SIZE = 2 * 1024 * 1024; // 2MB
+
     const logoInput = document.getElementById('logo-input');
     const logoPreview = document.getElementById('logo-preview');
     const container = logoInput.closest('div.flex');
 
     logoInput.addEventListener('change', function() {
         if (this.files && this.files[0]) {
+            if (this.files[0].size > MAX_SIZE) {
+                alert('A logo excede o tamanho máximo de 2MB. Por favor, escolha uma imagem menor.');
+                this.value = '';
+                logoPreview.src = '';
+                container.removeAttribute('data-has-file');
+                return;
+            }
             const reader = new FileReader();
             reader.onload = function(e) {
                 logoPreview.src = e.target.result;
@@ -138,6 +147,14 @@
     imagesInput.addEventListener('change', function() {
         shotsPreviewContainer.innerHTML = '';
         if (this.files && this.files.length > 0) {
+            const hasLargeFile = Array.from(this.files).some(file => file.size > MAX_SIZE);
+            if (hasLargeFile) {
+                alert('Uma ou mais imagens excedem o tamanho máximo de 2MB. Por favor, escolha imagens menores.');
+                this.value = '';
+                shotsPreviewContainer.classList.add('hidden');
+                return;
+            }
+
             shotsPreviewContainer.classList.remove('hidden');
             Array.from(this.files).forEach(file => {
                 const reader = new FileReader();
@@ -154,4 +171,4 @@
         }
     });
 </script>
-{% endblock %}
+{% endblock %}
