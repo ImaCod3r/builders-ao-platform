@@ -2,11 +2,48 @@ import {
   createPost,
   getFeedPosts,
   upvotePost,
+  getPostById,
+  updatePost,
+  deletePost,
 } from "../services/post.service.js";
 import { supabase } from "../config/supabase.js";
 
 export const renderCreatePost = (req, res) => {
   res.render("pages/create-post.njk", { user: req.user });
+};
+
+export const renderEditPost = async (req, res) => {
+  try {
+    const post = await getPostById(req.params.id);
+    if (post.author_id !== req.user.id) {
+      return res.redirect("/feed?error=NÃ£o autorizado");
+    }
+    res.render("pages/edit-post.njk", { user: req.user, post });
+  } catch (error) {
+    console.error("Erro ao carregar post para ediÃ§Ã£o:", error);
+    res.redirect("/feed?error=Post nÃ£o encontrado.");
+  }
+};
+
+export const handleUpdatePost = async (req, res) => {
+  try {
+    const { title, content } = req.body;
+    await updatePost(req.params.id, title, content, req.user.id);
+    res.redirect("/feed?success=Post atualizado com sucesso!");
+  } catch (error) {
+    console.error("Erro ao atualizar post:", error);
+    res.redirect("/feed?error=Erro ao atualizar o post.");
+  }
+};
+
+export const handleDeletePost = async (req, res) => {
+  try {
+    await deletePost(req.params.id, req.user.id);
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Erro ao excluir post:", error);
+    res.status(500).json({ success: false, error: "Erro ao excluir o post." });
+  }
 };
 
 export const handleCreatePost = async (req, res) => {

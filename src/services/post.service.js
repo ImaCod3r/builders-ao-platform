@@ -18,6 +18,47 @@ export const createPost = async (title, content, authorId, imageUrls = []) => {
   return data;
 };
 
+export const getPostById = async (postId) => {
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("id", postId)
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
+export const deletePost = async (postId, authorId) => {
+  // First verify if the post belongs to the author
+  const post = await getPostById(postId);
+  if (post.author_id !== authorId) {
+    throw new Error("Unauthorized");
+  }
+
+  const { error } = await supabase.from("posts").delete().eq("id", postId);
+
+  if (error) throw error;
+  return true;
+};
+
+export const updatePost = async (postId, title, content, authorId) => {
+  const post = await getPostById(postId);
+  if (post.author_id !== authorId) {
+    throw new Error("Unauthorized");
+  }
+
+  const { data, error } = await supabase
+    .from("posts")
+    .update({ title, content })
+    .eq("id", postId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+};
+
 export const getFeedPosts = async (userId = null) => {
   const { data: posts, error } = await supabase
     .from("posts")

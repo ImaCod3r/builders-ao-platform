@@ -7,6 +7,9 @@ import {
   renderFeed,
   handleUpvote,
   handleImageUpload,
+  renderEditPost,
+  handleUpdatePost,
+  handleDeletePost,
 } from "../controllers/post.controller.js";
 
 const postRouter = Router();
@@ -27,6 +30,11 @@ postRouter.post(
   upload.array("images", 4),
   handleCreatePost,
 );
+
+postRouter.get("/:id/edit", checkAuth, renderEditPost);
+postRouter.post("/:id/edit", checkAuth, handleUpdatePost);
+postRouter.delete("/:id", checkAuth, handleDeletePost);
+
 postRouter.post("/:id/upvote", checkAuth, handleUpvote);
 postRouter.post(
   "/upload-image",
