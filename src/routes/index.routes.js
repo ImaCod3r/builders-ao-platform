@@ -2,11 +2,15 @@ import { Router } from "express";
 import auth from "./auth.routes.js";
 import admin from "./admin.routes.js";
 import user from "./user.routes.js";
+import postRouter from "./post.routes.js";
 import { checkAuth } from "../middlewares/checkAuth.js";
 import productRouter from "./product.routes.js";
 import { getPublishedProducts } from "../services/product.service.js";
 
 const indexRouter = Router();
+
+indexRouter.use("/posts", postRouter);
+indexRouter.use("/feed", (req, res) => res.redirect("/posts/feed"));
 
 indexRouter.get("/", async (req, res) => {
   try {

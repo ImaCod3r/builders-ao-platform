@@ -87,7 +87,10 @@
             </a>
             
             <nav class="hidden md:flex items-center gap-6">
-                <!-- Links de navegação podem ser adicionados aqui -->
+                <a href="/feed" class="text-sm font-medium text-gray-600 hover:text-brand-red transition-colors flex items-center gap-2">
+                    <i data-lucide="rss" class="w-4 h-4"></i>
+                    Feed de Posts
+                </a>
             </nav>
 
             <div class="flex items-center gap-4">
@@ -212,6 +215,13 @@
             }, 200);
         }
 
+        // Close modal on click outside
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'global-modal') {
+                closeModal();
+            }
+        });
+
         // Toast Functions
         function showToast(message, type = 'error') {
             let toastContainer = document.getElementById('toast-container');
@@ -242,25 +252,6 @@
             }, 4000);
         }
     </script>
-</body>
-</html>
-            }, 10);
-        }
-
-        function closeModal() {
-            const modal = document.getElementById('global-modal');
-            const content = document.getElementById('modal-content');
-            content.classList.remove('scale-100', 'opacity-100');
-            content.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 200);
-        }
-
-        // Close modal on click outside
-        document.getElementById('global-modal').addEventListener('click', (e) => {
-            if (e.target.id === 'global-modal') closeModal();
-        });
-    </script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

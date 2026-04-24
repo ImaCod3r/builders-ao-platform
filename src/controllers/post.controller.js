@@ -1,0 +1,108 @@
+import {
+  createPost,
+  getFeedPosts,
+  upvotePost,
+} from "../services/post.service.js";
+import { supabase } from "../config/supabase.js";
+
+export const renderCreatePost = (req, res) => {
+  res.render("pages/create-post.njk", { user: req.user });
+};
+
+export const handleCreatePost = async (req, res) => {
+  try {
+    const { title, content } = req.body;
+    let urls = [];
+
+    // Upload each image manually sent with the form
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const fileExt = file.originalname.split(".").pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${req.user.id}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("post_images")
+          .upload(filePath, file.buffer, {
+            contentType: file.mimetype,
+          });
+
+        if (uploadError) throw uploadError;
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("post_images").getPublicUrl(filePath);
+
+        urls.push(publicUrl);
+      }
+    }
+
+    await createPost(title, content, req.user.id, urls);
+    res.redirect("/feed?success=Post criado com sucesso!");
+  } catch (error) {
+    console.error("Erro ao criar post:", error);
+    res.render("pages/create-post.njk", {
+      user: req.user,
+      error: "Erro ao criar post.",
+    });
+  }
+};
+
+export const renderFeed = async (req, res) => {
+  try {
+    const posts = await getFeedPosts(req.user?.id);
+    res.render("pages/feed.njk", {
+      user: req.user,
+      posts,
+      success: req.query.success,
+    });
+  } catch (error) {
+    console.error("Erro ao carregar feed:", error);
+    res.render("pages/feed.njk", {
+      user: req.user,
+      error: "Erro ao carregar posts.",
+    });
+  }
+};
+
+export const handleUpvote = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await upvotePost(id, req.user.id);
+    res.json({ success: true, action: result.action });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ success: false, error: "Erro ao processar curtida" });
+  }
+};
+
+export const handleImageUpload = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: "Nenhuma imagem enviada." });
+    }
+
+    const file = req.file;
+    const fileExt = file.originalname.split(".").pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    const filePath = `${req.user.id}/${fileName}`;
+
+    const { data, error } = await supabase.storage
+      .from("post_images")
+      .upload(filePath, file.buffer, {
+        contentType: file.mimetype,
+      });
+
+    if (error) throw error;
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("post_images").getPublicUrl(filePath);
+
+    res.json({ url: publicUrl });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erro no upload da imagem." });
+  }
+};
