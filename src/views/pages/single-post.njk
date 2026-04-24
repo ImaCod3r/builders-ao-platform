@@ -1,0 +1,246 @@
+{% extends "../layout/main.njk" %}
+
+{% block title %}{{ post.title }} - Builders AO Platform{% endblock %}
+{% block description %}{{ post.content | truncate(150) | replace("\n", " ") }}{% endblock %}
+
+{% block ogTitle %}{{ post.title }}{% endblock %}
+{% block ogDescription %}{{ post.content | truncate(150) | replace("\n", " ") }}{% endblock %}
+{% block ogImage %}{{ post.image_urls[0] if post.image_urls and post.image_urls.length > 0 else 'https://buildersangola.tech/assets/logo.png' }}{% endblock %}
+
+{% block twitterTitle %}{{ post.title }}{% endblock %}
+{% block twitterDescription %}{{ post.content | truncate(150) | replace("\n", " ") }}{% endblock %}
+{% block twitterImage %}{{ post.image_urls[0] if post.image_urls and post.image_urls.length > 0 else 'https://buildersangola.tech/assets/logo.png' }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 max-w-3xl mb-20 mt-12">
+    <!-- Voltar -->
+    <a href="/feed" class="inline-flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-brand-red mb-8 transition-colors">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i> Voltar ao Feed
+    </a>
+    
+    <article class="bg-white border border-gray-100 rounded-2xl p-6 md:p-10 shadow-premium">
+        <!-- Post Header -->
+        <div class="flex items-start justify-between gap-4 mb-8 relative">
+            <div class="flex items-center gap-4">
+                <img src="{{ post.users.avatar_url or 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + post.users.id }}" 
+                     alt="{{ post.users.name }}" 
+                     class="w-14 h-14 rounded-full border border-gray-200 object-cover">
+                <div>
+                    <h3 class="font-bold text-lg text-gray-900">{{ post.users.name }}</h3>
+                    <p class="text-sm text-gray-500">{{ post.created_at | date }}</p>
+                </div>
+            </div>
+            
+            {% if user and user.id == post.users.id %}
+                <div class="relative group">
+                    <button onclick="toggleDropdown(this)" class="p-2 text-gray-400 hover:text-gray-900 transition-colors rounded-full hover:bg-gray-50">
+                        <i data-lucide="more-horizontal" class="w-6 h-6"></i>
+                    </button>
+                    <div class="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-xl shadow-lg z-10 py-1 hidden dropdown-menu">
+                        <a href="/posts/{{ post.id }}/edit" class="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-brand-red transition-colors">
+                            <i data-lucide="edit-2" class="w-4 h-4"></i> Editar
+                        </a>
+                        <button onclick="deletePost('{{ post.id }}', this)" class="w-full flex items-center gap-2 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors text-left">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i> Excluir
+                        </button>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Post Title & Content -->
+        <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 leading-tight">{{ post.title }}</h1>
+        <div class="text-gray-700 text-lg leading-relaxed mb-8 whitespace-pre-wrap break-words">{{ post.content | escape | nl2br }}</div>
+
+        <!-- Galeria de Imagens -->
+        {% if post.image_urls and post.image_urls.length > 0 %}
+          <div class="grid gap-3 grid-cols-1 {% if post.image_urls.length > 1 %}sm:grid-cols-2{% endif %} mt-6 mb-8">
+            {% for img_url in post.image_urls %}
+              <div class="relative aspect-video w-full rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 cursor-pointer group" onclick="openLightbox('{{ img_url }}')">
+                <img src="{{ img_url }}" alt="Imagem do post" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                <div class="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                    <i data-lucide="maximize-2" class="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow-lg"></i>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+        <!-- Post Footer: Upvotes & Share -->
+        <div class="pt-6 border-t border-gray-100 flex items-center justify-between">
+            <button 
+                onclick="toggleUpvote('{{ post.id }}', this)"
+                class="flex items-center gap-2 group {{ 'opacity-50 cursor-not-allowed' if not user }}"
+                {{ 'disabled title="FaÃ§a login para curtir"' if not user }}
+            >
+                <div class="p-3 rounded-full transition-colors {{ 'bg-brand-light border-brand-red border' if post.has_upvoted else 'bg-gray-50 border border-gray-100 group-hover:border-brand-red group-hover:bg-brand-light' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="{{ '#dc2626' if post.has_upvoted else 'none' }}" class="transition-colors upvote-icon {{ 'stroke-brand-red' if post.has_upvoted else 'stroke-gray-400 group-hover:stroke-brand-red' }}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                    </svg>
+                </div>
+                <span class="font-bold text-lg transition-colors upvote-count {{ 'text-brand-red' if post.has_upvoted else 'text-gray-500 group-hover:text-brand-red' }}">{{ post.upvote_count }}</span>
+            </button>
+
+            <button onclick="sharePost('{{ post.id }}', '{{ post.title | replace("'", "\\'") }}')" class="flex items-center gap-2 text-gray-500 hover:text-brand-red group transition-colors px-4 py-3 rounded-xl hover:bg-brand-light border border-transparent hover:border-brand-red/20 font-semibold">
+                <i data-lucide="share-2" class="w-5 h-5 group-hover:scale-110 transition-transform"></i>
+                <span class="hidden sm:inline">Compartilhar</span>
+            </button>
+        </div>
+    </article>
+
+    <!-- Image Lightbox Modal -->
+    <div id="lightbox" class="fixed inset-0 z-[100] hidden flex-col items-center justify-center bg-black/95 backdrop-blur-sm transition-all duration-300 opacity-0" onclick="closeLightbox()">
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white/50 hover:text-white transition-colors bg-black/50 hover:bg-black/80 p-2 rounded-full z-50">
+            <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+        <img id="lightbox-img" src="" class="max-w-[95vw] max-h-[90vh] object-contain rounded-xl shadow-2xl scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Lightbox Script
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+
+    function openLightbox(url) {
+        lightboxImg.src = url;
+        lightbox.classList.remove('hidden');
+        lightbox.classList.add('flex');
+        void lightbox.offsetWidth; // Force reflow
+        
+        lightbox.classList.remove('opacity-0');
+        lightboxImg.classList.remove('scale-95');
+        lightboxImg.classList.add('scale-100');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        lightbox.classList.add('opacity-0');
+        lightboxImg.classList.remove('scale-100');
+        lightboxImg.classList.add('scale-95');
+        
+        setTimeout(() => {
+            lightbox.classList.add('hidden');
+            lightbox.classList.remove('flex');
+            lightboxImg.src = '';
+            document.body.style.overflow = '';
+        }, 300);
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !lightbox.classList.contains('hidden')) {
+            closeLightbox();
+        }
+    });
+
+    // Share Post
+    async function sharePost(postId, postTitle) {
+        const url = `${window.location.origin}/posts/${postId}`;
+        
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: postTitle,
+                    text: 'Dá uma olhada neste post na comunidade Builders AO!',
+                    url: url
+                });
+            } catch (err) {
+                console.log('Compartilhamento cancelado ou falhou', err);
+            }
+        } else {
+            try {
+                await navigator.clipboard.writeText(url);
+                if (typeof showToast === 'function') {
+                    showToast('Link do post copiado!', 'success');
+                } else {
+                    alert('Link copiado!');
+                }
+            } catch (e) {
+                console.error('Falha ao copiar:', e);
+            }
+        }
+    }
+
+    // Edit/Delete Dropdown
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.group')) {
+            document.querySelectorAll('.dropdown-menu').forEach(el => el.classList.add('hidden'));
+        }
+    });
+
+    function toggleDropdown(btn) {
+        const menus = document.querySelectorAll('.dropdown-menu');
+        menus.forEach(el => { if (el !== btn.nextElementSibling) el.classList.add('hidden') });
+        btn.nextElementSibling.classList.toggle('hidden');
+    }
+
+    async function deletePost(postId, btnEl) {
+        if (!confirm("Tem certeza que deseja excluir este post?")) return;
+        
+        try {
+            const response = await fetch(`/posts/${postId}`, { method: 'DELETE' });
+            const data = await response.json();
+            
+            if (data.success) {
+                window.location.href = '/feed?success=Post%20excluido%20com%20sucesso';
+            } else {
+                alert(data.error || 'Erro ao excluir.');
+            }
+        } catch(err) {
+            console.error(err);
+            alert('Erro ao excluir.');
+        }
+    }
+
+    // Upvote
+    async function toggleUpvote(postId, btnEl) {
+        const isLogged = btnEl.hasAttribute('disabled');
+        if (isLogged) {
+            if(typeof openModal === 'function') openModal('AÃ§Ã£o NecessÃ¡ria', 'VocÃª precisa estar logado para curtir o post.');
+            return;
+        }
+
+        const countEl = btnEl.querySelector('.upvote-count');
+        const iconEl = btnEl.querySelector('.upvote-icon');
+        const containerEl = iconEl.closest('div');
+        
+        let currentCount = parseInt(countEl.innerText);
+        btnEl.classList.add('opacity-50', 'pointer-events-none');
+        
+        try {
+            const response = await fetch(`/posts/${postId}/upvote`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const data = await response.json();
+            
+            if (data.success) {
+                if (data.action === 'added') {
+                    countEl.innerText = currentCount + 1;
+                    iconEl.classList.remove('stroke-gray-400');
+                    iconEl.classList.add('stroke-brand-red');
+                    iconEl.style.fill = '#dc2626';
+                    containerEl.classList.remove('bg-gray-50', 'border-gray-100');
+                    containerEl.classList.add('bg-brand-light', 'border-brand-red');
+                } else if (data.action === 'removed') {
+                    countEl.innerText = Math.max(0, currentCount - 1);
+                    iconEl.classList.add('stroke-gray-400');
+                    iconEl.classList.remove('stroke-brand-red');
+                    iconEl.style.fill = 'none';
+                    containerEl.classList.add('bg-gray-50', 'border-gray-100');
+                    containerEl.classList.remove('bg-brand-light', 'border-brand-red');
+                }
+            } else {
+                alert(data.error || "Erro ao curtir o post.");
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Erro de comunicaÃ§Ã£o com o servidor.");
+        } finally {
+            btnEl.classList.remove('opacity-50', 'pointer-events-none');
+        }
+    }
+</script>
+{% endblock %}

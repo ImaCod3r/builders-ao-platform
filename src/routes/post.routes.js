@@ -5,6 +5,7 @@ import {
   renderCreatePost,
   handleCreatePost,
   renderFeed,
+  renderSinglePost,
   handleUpvote,
   handleImageUpload,
   renderEditPost,
@@ -24,6 +25,7 @@ const upload = multer({
 
 postRouter.get("/feed", renderFeed);
 postRouter.get("/create", checkAuth, renderCreatePost);
+postRouter.get("/:id", renderSinglePost);
 postRouter.post(
   "/create",
   checkAuth,

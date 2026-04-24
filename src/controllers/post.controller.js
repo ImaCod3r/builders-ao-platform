@@ -135,6 +135,57 @@ export const renderFeed = async (req, res) => {
   }
 };
 
+export const renderSinglePost = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Precisamos buscar detalhes do autor também, como no feed
+    const { data: post, error } = await supabase
+      .from("posts")
+      .select("*")
+      .eq("id", id)
+      .single();
+
+    if (error || !post) throw new Error("Post nÃ£o encontrado");
+
+    // Buscar perfil do autor
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("full_name, avatar_url")
+      .eq("user_id", post.author_id)
+      .single();
+
+    let has_upvoted = false;
+    if (req.user) {
+      const { data: upvote } = await supabase
+        .from("post_upvotes")
+        .select("post_id")
+        .match({ post_id: post.id, user_id: req.user.id })
+        .maybeSingle();
+      if (upvote) has_upvoted = true;
+    }
+
+    const postEnriched = {
+      ...post,
+      users: {
+        id: post.author_id,
+        name: profile?.full_name || "UsuÃ¡rio",
+        avatar_url: profile?.avatar_url,
+      },
+      has_upvoted,
+    };
+
+    res.render("pages/single-post.njk", {
+      user: req.user,
+      post: postEnriched,
+      requestPath: req.originalUrl,
+    });
+  } catch (error) {
+    console.error("Erro ao carregar post Ãºnico:", error);
+    res.redirect("/feed?error=Post nÃ£o encontrado.");
+  }
+};
+
 export const handleUpvote = async (req, res) => {
   try {
     const { id } = req.params;
