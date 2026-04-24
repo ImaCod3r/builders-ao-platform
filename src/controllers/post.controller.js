@@ -27,8 +27,41 @@ export const renderEditPost = async (req, res) => {
 
 export const handleUpdatePost = async (req, res) => {
   try {
-    const { title, content } = req.body;
-    await updatePost(req.params.id, title, content, req.user.id);
+    const { title, content, existing_images } = req.body;
+    let urls = [];
+
+    if (existing_images) {
+      if (Array.isArray(existing_images)) {
+        urls = [...existing_images];
+      } else {
+        urls.push(existing_images);
+      }
+    }
+
+    // Upload each image manually sent with the form
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        const fileExt = file.originalname.split(".").pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${req.user.id}/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("post_images")
+          .upload(filePath, file.buffer, {
+            contentType: file.mimetype,
+          });
+
+        if (uploadError) throw uploadError;
+
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("post_images").getPublicUrl(filePath);
+
+        urls.push(publicUrl);
+      }
+    }
+
+    await updatePost(req.params.id, title, content, req.user.id, urls);
     res.redirect("/feed?success=Post atualizado com sucesso!");
   } catch (error) {
     console.error("Erro ao atualizar post:", error);

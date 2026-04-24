@@ -32,7 +32,12 @@ postRouter.post(
 );
 
 postRouter.get("/:id/edit", checkAuth, renderEditPost);
-postRouter.post("/:id/edit", checkAuth, handleUpdatePost);
+postRouter.post(
+  "/:id/edit",
+  checkAuth,
+  upload.array("images", 4),
+  handleUpdatePost,
+);
 postRouter.delete("/:id", checkAuth, handleDeletePost);
 
 postRouter.post("/:id/upvote", checkAuth, handleUpvote);

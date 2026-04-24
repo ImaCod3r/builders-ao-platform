@@ -42,7 +42,13 @@ export const deletePost = async (postId, authorId) => {
   return true;
 };
 
-export const updatePost = async (postId, title, content, authorId) => {
+export const updatePost = async (
+  postId,
+  title,
+  content,
+  authorId,
+  imageUrls = [],
+) => {
   const post = await getPostById(postId);
   if (post.author_id !== authorId) {
     throw new Error("Unauthorized");
@@ -50,7 +56,7 @@ export const updatePost = async (postId, title, content, authorId) => {
 
   const { data, error } = await supabase
     .from("posts")
-    .update({ title, content })
+    .update({ title, content, image_urls: imageUrls })
     .eq("id", postId)
     .select()
     .single();
