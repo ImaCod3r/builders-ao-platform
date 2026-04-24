@@ -146,7 +146,7 @@ export const renderSinglePost = async (req, res) => {
       .eq("id", id)
       .single();
 
-    if (error || !post) throw new Error("Post nÃ£o encontrado");
+    if (error || !post) throw new Error("Post não encontrado");
 
     // Buscar perfil do autor
     const { data: profile } = await supabase
@@ -169,7 +169,7 @@ export const renderSinglePost = async (req, res) => {
       ...post,
       users: {
         id: post.author_id,
-        name: profile?.full_name || "UsuÃ¡rio",
+        name: profile?.full_name || "Usuário",
         avatar_url: profile?.avatar_url,
       },
       has_upvoted,
@@ -181,8 +181,8 @@ export const renderSinglePost = async (req, res) => {
       requestPath: req.originalUrl,
     });
   } catch (error) {
-    console.error("Erro ao carregar post Ãºnico:", error);
-    res.redirect("/feed?error=Post nÃ£o encontrado.");
+    console.error("Erro ao carregar post único:", error);
+    res.redirect("/feed?error=Post não encontrado.");
   }
 };
 
